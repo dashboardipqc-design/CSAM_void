@@ -95,7 +95,7 @@ def prepare(raw,sheet,override):
 
 def fig_style(fig,height=350):
  fig.update_layout(template='plotly_dark',paper_bgcolor='#111b2d',plot_bgcolor='#111b2d',font_color='#e2e8f0',height=height,margin=dict(l=18,r=15,t=25,b=35),legend=dict(orientation='h',y=-.3,x=0),hovermode='x unified')
- fig.update_xaxes(gridcolor='#26374e');fig.update_yaxes(gridcolor='#26374e')
+ fig.update_xaxes(gridcolor='#26374e', tickfont=dict(size=10), title_font=dict(size=11));fig.update_yaxes(gridcolor='#26374e', tickfont=dict(size=10), title_font=dict(size=11));fig.update_layout(font=dict(size=11),legend_title_font=dict(size=11),legend_font=dict(size=10))
  return fig
 
 def chart_or_empty(frame,x,y,color,title,kind='bar'):
@@ -103,6 +103,11 @@ def chart_or_empty(frame,x,y,color,title,kind='bar'):
  if frame.empty:st.info('No matching records for this chart.');return
  if kind=='bar':fig=px.bar(frame,x=x,y=y,color=color,color_discrete_sequence=COLORS,barmode='stack')
  else:fig=px.line(frame,x=x,y=y,color=color,markers=True,color_discrete_sequence=COLORS)
+ if x == '__Month':
+  months=sorted(frame[x].dropna().unique())
+  labels=[pd.to_datetime(m,format='%Y-%m').strftime("%b'%y") if m != 'Unknown' else 'Unknown' for m in months]
+  fig.update_xaxes(type='category',categoryorder='array',categoryarray=months,tickmode='array',tickvals=months,ticktext=labels,tickangle=0,title_text='Month',tickfont=dict(size=9),automargin=True)
+ if color == '__Process':fig.update_layout(legend_title_text='Process')
  st.plotly_chart(fig_style(fig),use_container_width=True)
 
 st.title('CSAM Abnormality Monitoring')
